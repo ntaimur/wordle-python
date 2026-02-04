@@ -1,8 +1,47 @@
 import tkinter as tk
 import random
-gameLoop = True
+gameLoop = False # true to run game
 
 
+# ************************ TKINTER TESTING ************************
+
+import tkinter as tk
+from tkinter import ttk
+
+
+root = tk.Tk()
+root.title("Wordle 2.0") # title
+window_width = 600
+window_height = 800
+
+
+
+root.iconbitmap('./assets/wordle.ico') # set icon
+
+
+# get the screen dimension
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+
+# cant resize window
+root.resizable(False, False)
+
+# move to top 
+root.attributes('-topmost', 1)
+
+# find the center point
+center_x = int(screen_width/2 - window_width / 2)
+center_y = int(screen_height/2 - window_height / 2)
+
+# set the position of the window to the center of the screen
+root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
+
+
+
+
+
+# ************************ GAME ************************
+root.mainloop()
 
 # list of words 
 word_list_five = ["apple", "grape", "chair", "spice", "track", 
