@@ -1,47 +1,67 @@
 import tkinter as tk
 import random
-gameLoop = False # true to run game
+from tkinter import ttk
+from wordfreq import zipf_frequency
+gameLoop = True # true to run game
 
 
 # ************************ TKINTER TESTING ************************
 
-import tkinter as tk
-from tkinter import ttk
-
-
-root = tk.Tk()
-root.title("Wordle 2.0") # title
-window_width = 600
-window_height = 800
 
 
 
-root.iconbitmap('./assets/wordle.ico') # set icon
+# root = tk.Tk()
+# root.title("Wordle 2.0") # title
+# window_width = 600
+# window_height = 800
 
 
-# get the screen dimension
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
 
-# cant resize window
-root.resizable(False, False)
+# root.iconbitmap('./assets/wordle.ico') # set icon
 
-# move to top 
-root.attributes('-topmost', 1)
 
-# find the center point
-center_x = int(screen_width/2 - window_width / 2)
-center_y = int(screen_height/2 - window_height / 2)
+# # get the screen dimension
+# screen_width = root.winfo_screenwidth()
+# screen_height = root.winfo_screenheight()
 
-# set the position of the window to the center of the screen
-root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
+# # cant resize window
+# root.resizable(False, False)
+
+# # move to top 
+# root.attributes('-topmost', 1)
+
+# # find the center point
+# center_x = int(screen_width/2 - window_width / 2)
+# center_y = int(screen_height/2 - window_height / 2)
+
+# # set the position of the window to the center of the screen
+# root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
+
+
+
+
+# # exit button
+# exit_button = ttk.Button(
+#     root,
+#     text="Exit Game",
+# )   
+
+# exit_button.pack(
+#     ipadx=5,
+#     ipady=5,
+#     expand=True
+# )
+
+# root.mainloop()
+
+
 
 
 
 
 
 # ************************ GAME ************************
-root.mainloop()
+
 
 # list of words 
 word_list_five = ["apple", "grape", "chair", "spice", "track", 
@@ -69,6 +89,24 @@ word_list_six = [
     "ribbon","shower","throne","unfold","vacuum","window","wonder","yogurt","zipper","bridge"
 ]
 
+
+# func for playing again
+def game_loop_func():
+    global gameLoop
+    print("\nWant to play again?")
+    playAgain = input("Play again? (Y/N): ").lower().strip()
+    if playAgain == "y":
+        gameLoop = True # restart main game loop
+    elif playAgain == "n": # if no
+        print("Thanks for playing!")
+    else:
+        print("Invalid input. Please enter 'Y' or 'N'.") # keep looping until valid input
+        game_loop_func()
+
+
+
+
+
 while gameLoop: # main game loop
     
     gameLoop = False # stop loop when game starts
@@ -95,6 +133,10 @@ while gameLoop: # main game loop
             elif guess.isdigit(): # if guess is a number
                 print("Your guess must not have any numbers! ")
                 continue
+            elif zipf_frequency(guess, 'en') < 3.0: # if guess is not a common word
+                print("Your guess must be a real word! ")
+                continue
+
 
 
             attempts += 1 # increase attempt by 1 if valid guess
@@ -137,6 +179,10 @@ while gameLoop: # main game loop
             elif guess.isdigit(): # if guess is a number
                 print("Your guess must not have any numbers! ")
                 continue
+            elif zipf_frequency(guess, 'en') < 3.0: # if guess is not a common word
+                print("Your guess must be a real word! ")
+                continue
+
 
 
             attempts += 1 # increase attempt by 1 if valid guess
@@ -179,6 +225,9 @@ while gameLoop: # main game loop
             elif guess.isdigit(): # if guess is a number
                 print("Your guess must not have any numbers! ")
                 continue
+            elif zipf_frequency(guess, 'en') < 3.0: # if guess is not a common word
+                print("Your guess must be a real word! ")
+                continue
 
 
             attempts += 1 # increase attempt by 1 if valid guess
@@ -201,17 +250,7 @@ while gameLoop: # main game loop
         else:
             print(f"\nYou're out of attempts! The word was {word}!") # ran out of attempts
 
-    # func for playing again
-    def game_loop_func():
-        print("\nWant to play again?")
-        playAgain = input("Play again? (Y/N): ").lower().strip()
-        if playAgain == "y":
-            gameLoop = True # restart main game loop
-        elif playAgain == "n": # if no
-            print("Thanks for playing!")
-        else:
-            print("Invalid input. Please enter 'Y' or 'N'.") # keep looping until valid input
-            game_loop_func()
+
 
     # welcome
     print("\nWelcome to Wordle 2.0!")
