@@ -1,8 +1,9 @@
 import tkinter as tk
 import random
+from PIL import Image, ImageTk
 from tkinter import ttk
 from wordfreq import zipf_frequency
-gameLoop = True # true to run game
+gameLoop = False # true to run game
 
 
 # ************************ TKINTER TESTING ************************
@@ -10,49 +11,92 @@ gameLoop = True # true to run game
 
 
 
-# root = tk.Tk()
-# root.title("Wordle 2.0") # title
-# window_width = 600
-# window_height = 800
+import tkinter as tk
+
+root = tk.Tk()
+root.title("Wordle 2.0")  # title
+window_width = 600
+window_height = 800
+
+root.iconbitmap('./assets/wordle.ico')  # set icon
+
+# get the screen dimension
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+
+# cant resize window
+root.resizable(False, False)
+
+# move to top
+root.attributes('-topmost', 1)
+
+# find the center point
+center_x = int(screen_width/2 - window_width / 2)
+center_y = int(screen_height/2 - window_height / 2)
+
+# set the position of the window to the center of the screen
+root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
+
+######################### SCREEN 1 #########################
+
+screen1 = tk.Frame(root, width=600, height=800, bg="#e3e3e1")
+screen1.pack(fill="both", expand=True)
+
+######### LOGO #########
+img_Wordle_logo = Image.open("./assets/wordle-logo.png") 
+img = img_Wordle_logo.resize((100, 100)) # adjust size using pil
+
+wordle_logo = ImageTk.PhotoImage(img)
+logo_label = tk.Label(screen1, image=wordle_logo, bg="#e3e3e1") # image 
+logo_label.place(relx=0.5, rely=0.25, anchor="center")   # 25% down the screen
+
+######### TITLE #########
+title = tk.Label(screen1,
+                 text="Wordle 2.0",
+                 font=("Impact", 50),
+                 fg="black",
+                 bg="#e3e3e1")
+title.place(relx=0.5, rely=0.40, anchor="center")        # 40% down the screen
+information_title = tk.Label(screen1,
+                 text="A word guessing game\n made in Python!",
+                 font=("Times New Roman", 25),
+                 fg="black",
+                 bg="#e3e3e1")
+information_title.place(relx=0.5, rely=0.51, anchor="center")        # 51% down the screen
 
 
+######### FUNC TO GO TO NEXT PAGE #########
+def go_screen_2():
+    screen1.pack_forget()  # hide the first screen
+    screen2.pack(fill="both", expand=True)  # show screen 2
 
-# root.iconbitmap('./assets/wordle.ico') # set icon
+######### PLAY BUTTON #########
+play_button = tk.Button(screen1,
+                        text="Play ▶",
+                        command=go_screen_2,
+                        font=("Comfortaa", 15),
+                        width=8,
+                        height=1,
+                        fg="black",
+                        bg="#e3e3e1",
+                        borderwidth=5,
+                        relief="ridge") # border style
 
+play_button.bind("<Enter>", lambda e: play_button.config(bg="#d3d3d3"))
+play_button.bind("<Leave>", lambda e: play_button.config(bg="#e3e3e1"))
+play_button.place(relx=0.5, rely=0.65, anchor="center")  # 65% down the screen
 
-# # get the screen dimension
-# screen_width = root.winfo_screenwidth()
-# screen_height = root.winfo_screenheight()
+######################### SCREEN 2 #########################
 
-# # cant resize window
-# root.resizable(False, False)
+screen2 = tk.Frame(root, bg="#e3e3e1")
+choose_difficulty_text = tk.Label(screen2,
+                  text="Choose your difficulty: EASY (E), MEDIUM (M), HARD (H)...",
+                  bg="#e3e3e1",
+                  font=("Arial", 10))
+choose_difficulty_text.pack(pady=20)
 
-# # move to top 
-# root.attributes('-topmost', 1)
+root.mainloop()
 
-# # find the center point
-# center_x = int(screen_width/2 - window_width / 2)
-# center_y = int(screen_height/2 - window_height / 2)
-
-# # set the position of the window to the center of the screen
-# root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
-
-
-
-
-# # exit button
-# exit_button = ttk.Button(
-#     root,
-#     text="Exit Game",
-# )   
-
-# exit_button.pack(
-#     ipadx=5,
-#     ipady=5,
-#     expand=True
-# )
-
-# root.mainloop()
 
 
 
