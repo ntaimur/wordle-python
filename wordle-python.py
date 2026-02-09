@@ -25,7 +25,7 @@ screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
 # cant resize window
-root.resizable(False, False)
+root.resizable(False, False) # maybe change to true later
 
 # move to top
 root.attributes('-topmost', 1)
@@ -44,7 +44,7 @@ screen1.pack(fill="both", expand=True)
 
 ######### LOGO #########
 img_Wordle_logo = Image.open("./assets/wordle-logo.png") 
-img = img_Wordle_logo.resize((100, 100)) # adjust size using pil
+img = img_Wordle_logo.resize((100, 100)) # adjust size 
 
 wordle_logo = ImageTk.PhotoImage(img)
 logo_label = tk.Label(screen1, image=wordle_logo, bg="#e3e3e1") # image 
@@ -82,8 +82,9 @@ play_button = tk.Button(screen1,
                         borderwidth=5,
                         relief="ridge") # border style
 
-play_button.bind("<Enter>", lambda e: play_button.config(bg="#d3d3d3"))
+play_button.bind("<Enter>", lambda e: play_button.config(bg="#d3d3d3")) # effects on hover
 play_button.bind("<Leave>", lambda e: play_button.config(bg="#e3e3e1"))
+
 play_button.place(relx=0.5, rely=0.65, anchor="center")  # 65% down the screen
 
 ######################### SCREEN 2 #########################
