@@ -59,7 +59,7 @@ title = tk.Label(screen1,
 title.place(relx=0.5, rely=0.40, anchor="center")        # 40% down the screen
 information_title = tk.Label(screen1,
                  text="A word guessing game\n made in Python!",
-                 font=("Times New Roman", 25),
+                 font=("Georgia", 25),
                  fg="black",
                  bg="#e3e3e1")
 information_title.place(relx=0.5, rely=0.51, anchor="center")        # 51% down the screen
@@ -90,12 +90,73 @@ play_button.place(relx=0.5, rely=0.65, anchor="center")  # 65% down the screen
 ######################### SCREEN 2 #########################
 
 screen2 = tk.Frame(root, bg="#e3e3e1")
-choose_difficulty_text = tk.Label(screen2,
-                  text="Choose your difficulty: EASY (E), MEDIUM (M), HARD (H)...",
-                  bg="#e3e3e1",
-                  font=("Arial", 10))
-choose_difficulty_text.pack(pady=20)
 
+###### CHOOSE DIFFICULTY TEXT ######
+choose_difficulty_text = tk.Label(screen2,
+                                text="Choose your difficulty: ",  # text formatting for choosing difficulty
+                                font=("Impact", 35),
+                                fg="black",
+                                bg="#e3e3e1")
+
+choose_difficulty_text.place(relx=0.5, rely=0.37, anchor="center")        # 10% down the screen
+
+
+
+
+########### DIFFICULTY BUTTONS ############
+
+#### EASY BUTTON #####
+easy_button = tk.Button(screen2,
+                        text="Easy",
+                        font=("Georgia", 15),
+                        width=8,
+                        height=1,
+                        fg="black",
+                        bg="#8ef08e",
+                        borderwidth=5,
+                        relief="ridge") # border style
+
+easy_button.bind("<Enter>", lambda e: easy_button.config(bg="#cbf0cb")) # effects on hover
+easy_button.bind("<Leave>", lambda e: easy_button.config(bg="#8ef08e"))
+
+easy_button.place(relx=0.25, rely=0.5, anchor="center")  
+
+
+### MEDIUM BUTTON #####
+medium_button = tk.Button(screen2,
+                        text="Medium",
+                        font=("Georgia", 15),
+                        width=8,
+                        height=1,
+                        fg="black",
+                        bg="#ebeb78",
+                        borderwidth=5,
+                        relief="ridge") # border style
+
+medium_button.bind("<Enter>", lambda e: medium_button.config(bg="#fafac8")) # effects on hover
+medium_button.bind("<Leave>", lambda e: medium_button.config(bg="#ebeb78"))
+
+medium_button.place(relx=0.5, rely=0.5, anchor="center")  
+
+
+#### HARD BUTTON #####
+hard_button = tk.Button(screen2,
+                        text="Hard",
+                        font=("Georgia", 15),
+                        width=8,
+                        height=1,
+                        fg="black",
+                        bg="#fd7979",
+                        borderwidth=5,
+                        relief="ridge") # border style
+
+hard_button.bind("<Enter>", lambda e: hard_button.config(bg="#ffcece")) # effects on hover
+hard_button.bind("<Leave>", lambda e: hard_button.config(bg="#fd7979"))
+
+hard_button.place(relx=0.75, rely=0.5, anchor="center")  
+
+
+#### MAIN LOOP #####
 root.mainloop()
 
 
