@@ -6,7 +6,7 @@ from wordfreq import zipf_frequency
 gameLoop = False # true to run game
 
 
-# ************************ TKINTER TESTING ************************
+# ################################### TKINTER TESTING ###################################
 
 
 
@@ -105,6 +105,22 @@ choose_difficulty_text.place(relx=0.5, rely=0.37, anchor="center")        # 10% 
 
 ########### DIFFICULTY BUTTONS ############
 
+
+## funcs
+
+
+def go_screen_3_easy():
+    screen2.pack_forget()  # hide the first screen
+    go_screen_3_easy.pack(fill="both", expand=True)  # show screen 3
+
+def go_screen_3_medium():
+    screen2.pack_forget() 
+    go_screen_3_medium.pack(fill="both", expand=True)  
+
+def go_screen_3_hard():
+    screen2.pack_forget()  
+    go_screen_3_hard.pack(fill="both", expand=True) 
+
 #### EASY BUTTON #####
 easy_button = tk.Button(screen2,
                         text="Easy",
@@ -114,12 +130,22 @@ easy_button = tk.Button(screen2,
                         fg="black",
                         bg="#8ef08e",
                         borderwidth=5,
-                        relief="ridge") # border style
+                        relief="ridge",
+                        command=go_screen_3_easy) # border style
 
 easy_button.bind("<Enter>", lambda e: easy_button.config(bg="#cbf0cb")) # effects on hover
 easy_button.bind("<Leave>", lambda e: easy_button.config(bg="#8ef08e"))
 
 easy_button.place(relx=0.25, rely=0.5, anchor="center")  
+
+## quick description of easy difficulty
+easy_diff_desc = tk.Label(screen2,
+                                text="(4 letters)",  
+                                font=("Georgia", 12),
+                                fg="#000000",
+                                bg="#e3e3e1")
+
+easy_diff_desc.place(relx=0.25, rely=0.55, anchor="center")  
 
 
 ### MEDIUM BUTTON #####
@@ -131,13 +157,22 @@ medium_button = tk.Button(screen2,
                         fg="black",
                         bg="#ebeb78",
                         borderwidth=5,
-                        relief="ridge") # border style
+                        relief="ridge",
+                        command=go_screen_3_medium) # border style
 
 medium_button.bind("<Enter>", lambda e: medium_button.config(bg="#fafac8")) # effects on hover
 medium_button.bind("<Leave>", lambda e: medium_button.config(bg="#ebeb78"))
 
 medium_button.place(relx=0.5, rely=0.5, anchor="center")  
 
+## quick description of medium difficulty
+medium_diff_desc = tk.Label(screen2,
+                                text="(5 letters)",  
+                                font=("Georgia", 12),
+                                fg="#000000",
+                                bg="#e3e3e1")
+
+medium_diff_desc.place(relx=0.5, rely=0.55, anchor="center")  
 
 #### HARD BUTTON #####
 hard_button = tk.Button(screen2,
@@ -148,14 +183,28 @@ hard_button = tk.Button(screen2,
                         fg="black",
                         bg="#fd7979",
                         borderwidth=5,
-                        relief="ridge") # border style
+                        relief="ridge",
+                        command=go_screen_3_hard) # border style
 
 hard_button.bind("<Enter>", lambda e: hard_button.config(bg="#ffcece")) # effects on hover
 hard_button.bind("<Leave>", lambda e: hard_button.config(bg="#fd7979"))
 
 hard_button.place(relx=0.75, rely=0.5, anchor="center")  
 
+## quick description of hard difficulty
+hard_diff_desc = tk.Label(screen2,
+                                text="(6 letters)",  
+                                font=("Georgia", 12),
+                                fg="#000000",
+                                bg="#e3e3e1")
 
+hard_diff_desc.place(relx=0.75, rely=0.55, anchor="center")  
+
+
+## main game screens depending on button pressed
+
+
+    
 #### MAIN LOOP #####
 root.mainloop()
 
@@ -166,7 +215,7 @@ root.mainloop()
 
 
 
-# ************************ GAME ************************
+# ################################### GAME ###################################
 
 
 # list of words 
