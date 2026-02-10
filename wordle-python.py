@@ -5,13 +5,34 @@ from tkinter import ttk
 from wordfreq import zipf_frequency
 gameLoop = False # true to run game
 
+# list of words 
+word_list_five = ["apple", "grape", "chair", "spice", "track", 
+                "flame", "brick", "cloud", "plant", "sugar", 
+                "light", "sound", "crane", "blaze", "stone", 
+                "water", "bread", "smile", "pride", "globe", 
+                "sword", "dream", "magic", "storm", "tiger", 
+                "zebra", "eagle", "mouse", "snake", "robot", 
+                "laser", "piano", "candy", "beach", "ocean", 
+                "river", "earth", "space", "metal", "steel", 
+                "flock", "scent", "grain", "sweat", "laugh", 
+                "teeth", "heart", "brain"]
+
+word_list_four = ["rate","salt","mint","corn","wind","aero","easy","oath",
+                "clay","drip","echo","fame","gaze","hush","iron","jolt","keen","loud",
+                "moss","navy","opal","palm","quip","roam","soar","tide","ugly","vain",
+                "wade","yarn","zest","brim","chop","dune","envy","flap","glow","haze",
+                "idle","jazz","knot","lure","melt","numb","oval","perk","rift","sway"]
+
+word_list_six = [
+    "planet","silver","branch","marble","candle","forest","gentle","harbor","jungle","kitten",
+    "ladder","magnet","nectar","object","puzzle","quartz","rocket","saddle","tunnel","velvet",
+    "wander","yellow","zephyr","anchor","butter","copper","dragon","ember","fabric","galaxy",
+    "hammer","island","jester","keeper","laptop","market","notion","orange","pocket","quiver",
+    "ribbon","shower","throne","unfold","vacuum","window","wonder","yogurt","zipper","bridge"
+]
 
 # ################################### TKINTER TESTING ###################################
 
-
-
-
-import tkinter as tk
 
 root = tk.Tk()
 root.title("Wordle 2.0")  # title
@@ -56,14 +77,13 @@ title = tk.Label(screen1,
                  font=("Impact", 50),
                  fg="black",
                  bg="#e3e3e1")
-title.place(relx=0.5, rely=0.40, anchor="center")        # 40% down the screen
+title.place(relx=0.5, rely=0.40, anchor="center")        
 information_title = tk.Label(screen1,
                  text="A word guessing game\n made in Python!",
                  font=("Georgia", 25),
                  fg="black",
                  bg="#e3e3e1")
-information_title.place(relx=0.5, rely=0.51, anchor="center")        # 51% down the screen
-
+information_title.place(relx=0.5, rely=0.51, anchor="center")       
 
 ######### FUNC TO GO TO NEXT PAGE #########
 def go_screen_2():
@@ -85,7 +105,7 @@ play_button = tk.Button(screen1,
 play_button.bind("<Enter>", lambda e: play_button.config(bg="#d3d3d3")) # effects on hover
 play_button.bind("<Leave>", lambda e: play_button.config(bg="#e3e3e1"))
 
-play_button.place(relx=0.5, rely=0.65, anchor="center")  # 65% down the screen
+play_button.place(relx=0.5, rely=0.65, anchor="center")  
 
 ######################### SCREEN 2 #########################
 
@@ -98,7 +118,7 @@ choose_difficulty_text = tk.Label(screen2,
                                 fg="black",
                                 bg="#e3e3e1")
 
-choose_difficulty_text.place(relx=0.5, rely=0.37, anchor="center")        # 10% down the screen
+choose_difficulty_text.place(relx=0.5, rely=0.37, anchor="center")        
 
 
 
@@ -106,20 +126,86 @@ choose_difficulty_text.place(relx=0.5, rely=0.37, anchor="center")        # 10% 
 ########### DIFFICULTY BUTTONS ############
 
 
-## funcs
+## create 3rd screen 
+screen3 = tk.Frame(root, width=600, height=800, bg="#e3e3e1")
 
 
-def go_screen_3_easy():
-    screen2.pack_forget()  # hide the first screen
-    go_screen_3_easy.pack(fill="both", expand=True)  # show screen 3
+############## GUESS CHECKER ##############
+def check_guess(entry, target_word):
+    global current_row
 
-def go_screen_3_medium():
-    screen2.pack_forget() 
-    go_screen_3_medium.pack(fill="both", expand=True)  
+    guess = entry.get().lower().strip()
+    entry.delete(0, tk.END) # clear entry after sumbit
 
-def go_screen_3_hard():
-    screen2.pack_forget()  
-    go_screen_3_hard.pack(fill="both", expand=True) 
+    # check guess
+    if len(guess) != len(target_word):
+        return
+    if guess.isdigit():
+        return
+    if zipf_frequency(guess, 'en') < 3.0: # check if real word in english
+        return
+
+    # fill tiles
+    for i, letter in enumerate(guess):
+        tile = tiles[current_row][i]
+        tile.config(text=letter.upper())
+
+        if guess[i] == target_word[i]:
+            tile.config(bg="#8ef08e")  # green
+        elif guess[i] in target_word:
+            tile.config(bg="#ebeb78")  # yellow
+        else:
+            tile.config(bg="#ADADAD")  # red
+    current_row += 1
+
+
+    # need to make something for if u run out of guesses or win
+    
+
+
+############### GAME FUNCTION ###############
+def start_game(word_length, word_list):
+    screen2.pack_forget()
+    screen3.pack(fill="both", expand=True)
+
+    # pick random word
+    target_word = random.choice(word_list)
+
+
+    board_frame = tk.Frame(screen3, bg="#e3e3e1")
+    board_frame.pack(pady=25)
+
+    # store tiles
+    global tiles, current_row
+    tiles = []
+    current_row = 0
+
+    # create 6 rows of tiles
+    for row in range(6):
+        row_tiles = []
+        for col in range(word_length):
+            tile = tk.Label(board_frame,
+                            text="",
+                            font=("Georgia", 20, "bold"),
+                            width=4,
+                            height=2,
+                            bg="#d9d9d9",
+                            relief="ridge",
+                            borderwidth=3)
+            tile.grid(row=row, column=col, padx=5, pady=10)
+            row_tiles.append(tile)
+        tiles.append(row_tiles)
+
+    # input box
+    guess_entry = tk.Entry(board_frame, font=("Georgia", 20), justify="center")
+    guess_entry.grid(row=7, column=0, columnspan=word_length, pady=20)
+
+    # submit 
+    guess_entry.bind("<Return>", lambda e: check_guess(guess_entry, target_word))
+
+
+    # keyboard at bottom for like seeing what youve already guessed
+
 
 #### EASY BUTTON #####
 easy_button = tk.Button(screen2,
@@ -131,7 +217,7 @@ easy_button = tk.Button(screen2,
                         bg="#8ef08e",
                         borderwidth=5,
                         relief="ridge",
-                        command=go_screen_3_easy) # border style
+                        command= lambda: start_game(4, word_list_four)) 
 
 easy_button.bind("<Enter>", lambda e: easy_button.config(bg="#cbf0cb")) # effects on hover
 easy_button.bind("<Leave>", lambda e: easy_button.config(bg="#8ef08e"))
@@ -140,10 +226,10 @@ easy_button.place(relx=0.25, rely=0.5, anchor="center")
 
 ## quick description of easy difficulty
 easy_diff_desc = tk.Label(screen2,
-                                text="(4 letters)",  
-                                font=("Georgia", 12),
-                                fg="#000000",
-                                bg="#e3e3e1")
+                            text="(4 letters)",  
+                            font=("Georgia", 12),
+                            fg="#000000",
+                            bg="#e3e3e1")
 
 easy_diff_desc.place(relx=0.25, rely=0.55, anchor="center")  
 
@@ -158,19 +244,19 @@ medium_button = tk.Button(screen2,
                         bg="#ebeb78",
                         borderwidth=5,
                         relief="ridge",
-                        command=go_screen_3_medium) # border style
+                        command= lambda: start_game(5, word_list_five)) 
 
-medium_button.bind("<Enter>", lambda e: medium_button.config(bg="#fafac8")) # effects on hover
+medium_button.bind("<Enter>", lambda e: medium_button.config(bg="#fafac8")) 
 medium_button.bind("<Leave>", lambda e: medium_button.config(bg="#ebeb78"))
 
 medium_button.place(relx=0.5, rely=0.5, anchor="center")  
 
 ## quick description of medium difficulty
 medium_diff_desc = tk.Label(screen2,
-                                text="(5 letters)",  
-                                font=("Georgia", 12),
-                                fg="#000000",
-                                bg="#e3e3e1")
+                            text="(5 letters)",  
+                            font=("Georgia", 12),
+                            fg="#000000",
+                            bg="#e3e3e1")
 
 medium_diff_desc.place(relx=0.5, rely=0.55, anchor="center")  
 
@@ -184,27 +270,31 @@ hard_button = tk.Button(screen2,
                         bg="#fd7979",
                         borderwidth=5,
                         relief="ridge",
-                        command=go_screen_3_hard) # border style
+                        command= lambda: start_game(6, word_list_six)) 
 
-hard_button.bind("<Enter>", lambda e: hard_button.config(bg="#ffcece")) # effects on hover
+hard_button.bind("<Enter>", lambda e: hard_button.config(bg="#ffcece")) 
 hard_button.bind("<Leave>", lambda e: hard_button.config(bg="#fd7979"))
 
 hard_button.place(relx=0.75, rely=0.5, anchor="center")  
 
 ## quick description of hard difficulty
 hard_diff_desc = tk.Label(screen2,
-                                text="(6 letters)",  
-                                font=("Georgia", 12),
-                                fg="#000000",
-                                bg="#e3e3e1")
+                        text="(6 letters)",  
+                        font=("Georgia", 12),
+                        fg="#000000",
+                        bg="#e3e3e1")
 
 hard_diff_desc.place(relx=0.75, rely=0.55, anchor="center")  
 
 
-## main game screens depending on button pressed
 
 
-    
+
+
+
+
+
+
 #### MAIN LOOP #####
 root.mainloop()
 
@@ -218,31 +308,7 @@ root.mainloop()
 # ################################### GAME ###################################
 
 
-# list of words 
-word_list_five = ["apple", "grape", "chair", "spice", "track", 
-                "flame", "brick", "cloud", "plant", "sugar", 
-                "light", "sound", "crane", "blaze", "stone", 
-                "water", "bread", "smile", "pride", "globe", 
-                "sword", "dream", "magic", "storm", "tiger", 
-                "zebra", "eagle", "mouse", "snake", "robot", 
-                "laser", "piano", "candy", "beach", "ocean", 
-                "river", "earth", "space", "metal", "steel", 
-                "flock", "scent", "grain", "sweat", "laugh", 
-                "teeth", "heart", "brain"]
 
-word_list_four = ["rate","salt","mint","corn","wind","aero","easy","oath",
-                "clay","drip","echo","fame","gaze","hush","iron","jolt","keen","loud",
-                "moss","navy","opal","palm","quip","roam","soar","tide","ugly","vain",
-                "wade","yarn","zest","brim","chop","dune","envy","flap","glow","haze",
-                "idle","jazz","knot","lure","melt","numb","oval","perk","rift","sway"]
-
-word_list_six = [
-    "planet","silver","branch","marble","candle","forest","gentle","harbor","jungle","kitten",
-    "ladder","magnet","nectar","object","puzzle","quartz","rocket","saddle","tunnel","velvet",
-    "wander","yellow","zephyr","anchor","butter","copper","dragon","ember","fabric","galaxy",
-    "hammer","island","jester","keeper","laptop","market","notion","orange","pocket","quiver",
-    "ribbon","shower","throne","unfold","vacuum","window","wonder","yogurt","zipper","bridge"
-]
 
 
 # func for playing again
