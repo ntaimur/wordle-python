@@ -127,7 +127,7 @@ choose_difficulty_text.place(relx=0.5, rely=0.37, anchor="center")
 
 
 ## create 3rd screen 
-screen3 = tk.Frame(root, width=600, height=800, bg="#e3e3e1")
+screen3 = tk.Frame(root, width=600, height=800, bg="#1B1A1A")
 
 
 ############## GUESS CHECKER ##############
@@ -154,25 +154,25 @@ def check_guess(entry, target_word):
         kb_tile = keyboard_tiles[letter.upper()]
 
         if guess[i] == target_word[i]:
-            tile.config(bg="#8ef08e")  # right
-            kb_tile.config(bg="#8ef08e") # update keyboard tile color   
+            tile.config(bg="#359e35")  # right
+            kb_tile.config(bg="#359e35") # update keyboard tile color   
         elif guess[i] in target_word:
-            tile.config(bg="#ebeb78")  # wrong pos
-            if kb_tile.cget("bg") != "#8ef08e": # only update keyboard tile color if not already green
-                kb_tile.config(bg="#ebeb78")
+            tile.config(bg="#d8d843")  # wrong pos
+            if kb_tile.cget("bg") != "#359e35": # only update keyboard tile color if not already green
+                kb_tile.config(bg="#d8d843")
         else:
-            tile.config(bg="#ADADAD")  # no
-            if kb_tile.cget("bg") != "#8ef08e" and kb_tile.cget("bg") != "#ebeb78": # only update keyboard tile color if not already green or yellow
-                kb_tile.config(bg="#797979")
+            tile.config(bg="#424242")  # no
+            if kb_tile.cget("bg") != "#359e35" and kb_tile.cget("bg") != "#d8d843": # only update keyboard tile color if not already green or yellow
+                kb_tile.config(bg="#424242")
     current_row += 1
 
     if current_row >= 6:
         # game over - user lost
-        game_over_label = tk.Label(screen3, text="Game Over! You Lost!", font=("Georgia", 25), fg="red", bg="#e3e3e1")
+        game_over_label = tk.Label(screen3, text="Game Over! You Lost!", font=("Georgia", 25), fg="red", bg="#1B1A1A")
         game_over_label.pack(pady=20)
     elif guess == target_word:
         # user won
-        win_label = tk.Label(screen3, text="Congratulations! You Won!", font=("Georgia", 25), fg="green", bg="#e3e3e1")
+        win_label = tk.Label(screen3, text="Congratulations! You Won!", font=("Georgia", 25), fg="green", bg="#1B1A1A")
         win_label.pack(pady=20)
 
 
@@ -185,7 +185,7 @@ def start_game(word_length, word_list):
     target_word = random.choice(word_list)
 
 
-    board_frame = tk.Frame(screen3, bg="#e3e3e1")
+    board_frame = tk.Frame(screen3, bg="#1B1A1A")
     board_frame.pack(pady=25)
 
     # store tiles
@@ -199,13 +199,14 @@ def start_game(word_length, word_list):
         for col in range(word_length):
             tile = tk.Label(board_frame,
                             text="",
-                            font=("Arial", 20, "bold"),
+                            font=("Arial Black", 20, "bold"),
                             width=4,
                             height=2,
-                            bg="#d9d9d9",
+                            bg="#1B1A1A",
+                            fg="white",
                             relief="ridge",
                             borderwidth=3)
-            tile.grid(row=row, column=col, padx=5, pady=5)
+            tile.grid(row=row, column=col, padx=5, pady=2)
             row_tiles.append(tile)
         tiles.append(row_tiles)
 
@@ -213,14 +214,15 @@ def start_game(word_length, word_list):
     guess_entry = tk.Entry(board_frame, font=("Georgia", 20), justify="center")
     guess_entry.grid(row=7, column=0, columnspan=word_length, pady=10)
 
+
     # submit 
     guess_entry.bind("<Return>", lambda e: check_guess(guess_entry, target_word))
 
 
-    # keyboard at bottom for like seeing what youve already guessed
+    ############################# KEYBOARD #############################
 
     alphabet = ["QWERTYUIOP ", " ASDFGHJKL ", "  ZXCVBNM  "]
-    keyboard_frame = tk.Frame(screen3, bg="#e3e3e1")
+    keyboard_frame = tk.Frame(screen3, bg="#1B1A1A")
     global keyboard_tiles
     keyboard_tiles = {} 
     keyboard_frame.pack(pady=1)
@@ -231,9 +233,11 @@ def start_game(word_length, word_list):
                             font=("Arial", 20),
                             width=2,
                             height=1,
-                            bg="#B9B9B9",
-                            relief="ridge",
-                            borderwidth=3
+                            bg="#1B1A1A",
+                            fg="white",
+                            relief="sunken",
+                            borderwidth=2
+                
                             )
             tile.grid(row=r, column=i, padx=1, pady=5)
             keyboard_tiles[letter] = tile
