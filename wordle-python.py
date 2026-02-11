@@ -133,7 +133,7 @@ screen3 = tk.Frame(root, width=600, height=800, bg="#e3e3e1")
 ############## GUESS CHECKER ##############
 def check_guess(entry, target_word):
     global current_row
-
+    global guess
     guess = entry.get().lower().strip()
     entry.delete(0, tk.END) # clear entry after sumbit
 
@@ -146,21 +146,34 @@ def check_guess(entry, target_word):
         return
 
     # fill tiles
-    for i, letter in enumerate(guess):
+    for i in range(len(guess)):
+        letter = guess[i]
         tile = tiles[current_row][i]
         tile.config(text=letter.upper())
 
+        kb_tile = keyboard_tiles[letter.upper()]
+
         if guess[i] == target_word[i]:
-            tile.config(bg="#8ef08e")  # green
+            tile.config(bg="#8ef08e")  # right
+            kb_tile.config(bg="#8ef08e") # update keyboard tile color   
         elif guess[i] in target_word:
-            tile.config(bg="#ebeb78")  # yellow
+            tile.config(bg="#ebeb78")  # wrong pos
+            if kb_tile.cget("bg") != "#8ef08e": # only update keyboard tile color if not already green
+                kb_tile.config(bg="#ebeb78")
         else:
-            tile.config(bg="#ADADAD")  # red
+            tile.config(bg="#ADADAD")  # no
+            if kb_tile.cget("bg") != "#8ef08e" and kb_tile.cget("bg") != "#ebeb78": # only update keyboard tile color if not already green or yellow
+                kb_tile.config(bg="#797979")
     current_row += 1
 
-
-    # need to make something for if u run out of guesses or win
-    
+    if current_row >= 6:
+        # game over - user lost
+        game_over_label = tk.Label(screen3, text="Game Over! You Lost!", font=("Georgia", 25), fg="red", bg="#e3e3e1")
+        game_over_label.pack(pady=20)
+    elif guess == target_word:
+        # user won
+        win_label = tk.Label(screen3, text="Congratulations! You Won!", font=("Georgia", 25), fg="green", bg="#e3e3e1")
+        win_label.pack(pady=20)
 
 
 ############### GAME FUNCTION ###############
@@ -177,7 +190,7 @@ def start_game(word_length, word_list):
 
     # store tiles
     global tiles, current_row
-    tiles = []
+    tiles = [] # empty list to store tile labels
     current_row = 0
 
     # create 6 rows of tiles
@@ -186,25 +199,44 @@ def start_game(word_length, word_list):
         for col in range(word_length):
             tile = tk.Label(board_frame,
                             text="",
-                            font=("Georgia", 20, "bold"),
+                            font=("Arial", 20, "bold"),
                             width=4,
                             height=2,
                             bg="#d9d9d9",
                             relief="ridge",
                             borderwidth=3)
-            tile.grid(row=row, column=col, padx=5, pady=10)
+            tile.grid(row=row, column=col, padx=5, pady=5)
             row_tiles.append(tile)
         tiles.append(row_tiles)
 
     # input box
     guess_entry = tk.Entry(board_frame, font=("Georgia", 20), justify="center")
-    guess_entry.grid(row=7, column=0, columnspan=word_length, pady=20)
+    guess_entry.grid(row=7, column=0, columnspan=word_length, pady=10)
 
     # submit 
     guess_entry.bind("<Return>", lambda e: check_guess(guess_entry, target_word))
 
 
     # keyboard at bottom for like seeing what youve already guessed
+
+    alphabet = ["QWERTYUIOP ", " ASDFGHJKL ", "  ZXCVBNM  "]
+    keyboard_frame = tk.Frame(screen3, bg="#e3e3e1")
+    global keyboard_tiles
+    keyboard_tiles = {} 
+    keyboard_frame.pack(pady=1)
+    for r, row in enumerate(alphabet):
+        for i, letter in enumerate(row):
+            tile = tk.Label (keyboard_frame,
+                            text=letter,
+                            font=("Arial", 20),
+                            width=2,
+                            height=1,
+                            bg="#B9B9B9",
+                            relief="ridge",
+                            borderwidth=3
+                            )
+            tile.grid(row=r, column=i, padx=1, pady=5)
+            keyboard_tiles[letter] = tile
 
 
 #### EASY BUTTON #####
