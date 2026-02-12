@@ -4,6 +4,12 @@ from PIL import Image, ImageTk
 from tkinter import ttk
 from wordfreq import zipf_frequency
 gameLoop = False # true to run game
+import os
+import sys
+
+def restart():
+    os.execv(sys.executable, ['python'] + sys.argv)
+
 
 # list of words 
 word_list_five = ["apple", "grape", "chair", "spice", "track", 
@@ -38,6 +44,8 @@ root = tk.Tk()
 root.title("Wordle 2.0")  # title
 window_width = 600
 window_height = 800
+root.attributes("-alpha", 1.0)
+
 
 root.iconbitmap('./assets/wordle.ico')  # set icon
 
@@ -57,6 +65,48 @@ center_y = int(screen_height/2 - window_height / 2)
 
 # set the position of the window to the center of the screen
 root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
+
+
+######################### FADING ANIMATION #########################
+
+
+def switch_to_next_screen(callback=None):
+    if screen1.winfo_ismapped():
+        screen1.pack_forget()
+        screen2.pack(fill="both", expand=True)
+    elif screen2.winfo_ismapped():
+        screen2.pack_forget()
+        screen3.pack(fill="both", expand=True)
+    elif screen3.winfo_ismapped():
+        screen3.pack_forget()
+        screen4.pack(fill="both", expand=True)
+    elif screen4.winfo_ismapped():
+        screen4.pack_forget()
+        screen1.pack(fill="both", expand=True)
+
+    if callback:
+        callback()
+
+
+
+def fade_in(window, step=0.05):
+    alpha = float(window.attributes("-alpha"))
+    if alpha < 1:
+        alpha += step
+        window.attributes("-alpha", alpha)
+        window.after(20, lambda: fade_in(window, step))
+
+def fade_out(window, step=0.05, callback=None):
+    alpha = float(window.attributes("-alpha"))
+    if alpha > 0.5:
+        alpha -= step
+        window.attributes("-alpha", alpha)
+        window.after(20, lambda: fade_out(window, step, callback))
+    else:
+        switch_to_next_screen(callback)
+        fade_in(window)
+
+
 
 ######################### SCREEN 1 #########################
 
@@ -85,15 +135,12 @@ information_title = tk.Label(screen1,
                  bg="#e3e3e1")
 information_title.place(relx=0.5, rely=0.51, anchor="center")       
 
-######### FUNC TO GO TO NEXT PAGE #########
-def go_screen_2():
-    screen1.pack_forget()  # hide the first screen
-    screen2.pack(fill="both", expand=True)  # show screen 2
+
 
 ######### PLAY BUTTON #########
 play_button = tk.Button(screen1,
                         text="Play ▶",
-                        command=go_screen_2,
+                        command=lambda: fade_out(root),
                         font=("Comfortaa", 15),
                         width=8,
                         height=1,
@@ -130,19 +177,53 @@ choose_difficulty_text.place(relx=0.5, rely=0.37, anchor="center")
 screen3 = tk.Frame(root, width=600, height=800, bg="#1B1A1A")
 
 
+## create game over screen 
+screen4 = tk.Frame(root, width=600, height=800, bg="#1B1A1A")
+
+
 ############## GUESS CHECKER ##############
+
+def disappearing_text(label, duration=1000):
+    label.after(duration, label.destroy) # destroy label after duration
+
+
+
 def check_guess(entry, target_word):
     global current_row
     global guess
     guess = entry.get().lower().strip()
     entry.delete(0, tk.END) # clear entry after sumbit
 
+
+
+
     # check guess
     if len(guess) != len(target_word):
+        world_letter_amount_invalid = tk.Label(screen3,
+                                text=f"Your guess must be {len(target_word)} letters!",  
+                                font=("Georgia", 15),
+                                fg="red",
+                                bg="#1B1A1A")
+        world_letter_amount_invalid.place(relx=0.5, rely=0.775, anchor="center")
+        disappearing_text(world_letter_amount_invalid) # call destroying func   
         return
-    if guess.isdigit():
+    if any(char.isdigit() for char in guess):
+        world_letter_has_digit_invalid = tk.Label(screen3,
+                                text=f"Your guess must have no digits!",  
+                                font=("Georgia", 15),
+                                fg="red",
+                                bg="#1B1A1A")
+        world_letter_has_digit_invalid.place(relx=0.5, rely=0.775, anchor="center")
+        disappearing_text(world_letter_has_digit_invalid) # call destroying func   
         return
     if zipf_frequency(guess, 'en') < 3.0: # check if real word in english
+        world_letter_not_real_invalid = tk.Label(screen3,
+                                text=f"Your guess must be a real word!",  
+                                font=("Georgia", 15),
+                                fg="red",
+                                bg="#1B1A1A")
+        world_letter_not_real_invalid.place(relx=0.5, rely=0.775, anchor="center")
+        disappearing_text(world_letter_not_real_invalid) # call destroying func   
         return
 
     # fill tiles
@@ -166,17 +247,69 @@ def check_guess(entry, target_word):
                 kb_tile.config(bg="#424242")
     current_row += 1
 
-    if current_row >= 6:
-        # game over - user lost
-        game_over_label = tk.Label(screen3, text="Game Over! You Lost!", font=("Georgia", 25), fg="red", bg="#1B1A1A")
-        game_over_label.pack(pady=20)
-    elif guess == target_word:
-        # user won
-        win_label = tk.Label(screen3, text="Congratulations! You Won!", font=("Georgia", 25), fg="green", bg="#1B1A1A")
-        win_label.pack(pady=20)
 
+    ############### CHECK IF GAME OVER ##############
 
-############### GAME FUNCTION ###############
+    if guess == target_word:
+        fade_out(root) # go to game over screen
+        win_label = tk.Label(screen4, 
+                             text="You Won!",
+                            font=("Impact", 60), 
+                            fg="white", 
+                            bg="#1B1A1A")
+        win_label.place(relx=0.5, rely=0.3, anchor="center")    
+
+        ############### PLAY AGAIN BUTTON ###############
+
+        play_again_button = tk.Button(screen4,
+                        text="Play Again",
+                        command=lambda: restart(),
+                        font=("Comfortaa", 15),
+                        width=10,
+                        height=2,
+                        fg="black",
+                        bg="#e3e3e1",
+                        borderwidth=5,
+                        relief="ridge") # border style
+
+        play_again_button.bind("<Enter>", lambda e: play_again_button.config(bg="#d3d3d3")) # effects on hover
+        play_again_button.bind("<Leave>", lambda e: play_again_button.config(bg="#e3e3e1"))
+
+        play_again_button.place(relx=0.5, rely=0.65, anchor="center")      
+    elif current_row >= 6:
+        fade_out(root) # go to game over screen
+        game_over_label = tk.Label(screen4,
+                                    text="You Lost!",
+                                    font=("Impact", 60),
+                                    fg="white", 
+                                    bg="#1B1A1A")
+        game_over_label.place(relx=0.5, rely=0.3, anchor="center")
+        game_over_desc1 = tk.Label(screen4,
+                                    text=f"You're out of attempts!\n The word was {target_word.upper()}!",
+                                    font=("Georgia", 20),
+                                    fg="white", 
+                                    bg="#1B1A1A")
+        game_over_desc1.place(relx=0.5, rely=0.5, anchor="center")
+        
+        ############### PLAY AGAIN BUTTON ###############
+
+        play_again_button = tk.Button(screen4,
+                        text="Play Again",
+                        command=lambda: restart(),
+                        font=("Comfortaa", 15),
+                        width=10,
+                        height=2,
+                        fg="black",
+                        bg="#e3e3e1",
+                        borderwidth=5,
+                        relief="ridge") # border style
+
+        play_again_button.bind("<Enter>", lambda e: play_again_button.config(bg="#d3d3d3")) # effects on hover
+        play_again_button.bind("<Leave>", lambda e: play_again_button.config(bg="#e3e3e1"))
+
+        play_again_button.place(relx=0.5, rely=0.65, anchor="center")  
+
+############################################################ MAIN GAME FUNCTION ###########################################################################
 def start_game(word_length, word_list):
     screen2.pack_forget()
     screen3.pack(fill="both", expand=True)
@@ -212,7 +345,7 @@ def start_game(word_length, word_list):
 
     # input box
     guess_entry = tk.Entry(board_frame, font=("Georgia", 20), justify="center")
-    guess_entry.grid(row=7, column=0, columnspan=word_length, pady=10)
+    guess_entry.grid(row=7, column=0, columnspan=word_length, pady=12)
 
 
     # submit 
@@ -224,7 +357,7 @@ def start_game(word_length, word_list):
     alphabet = ["QWERTYUIOP ", " ASDFGHJKL ", "  ZXCVBNM  "]
     keyboard_frame = tk.Frame(screen3, bg="#1B1A1A")
     global keyboard_tiles
-    keyboard_tiles = {} 
+    keyboard_tiles = {}
     keyboard_frame.pack(pady=1)
     for r, row in enumerate(alphabet):
         for i, letter in enumerate(row):
@@ -236,8 +369,7 @@ def start_game(word_length, word_list):
                             bg="#1B1A1A",
                             fg="white",
                             relief="sunken",
-                            borderwidth=2
-                
+                            borderwidth=1
                             )
             tile.grid(row=r, column=i, padx=1, pady=5)
             keyboard_tiles[letter] = tile
@@ -253,7 +385,11 @@ easy_button = tk.Button(screen2,
                         bg="#8ef08e",
                         borderwidth=5,
                         relief="ridge",
-                        command= lambda: start_game(4, word_list_four)) 
+                        command=lambda: fade_out(root, callback=lambda: start_game(4, word_list_four)),)
+
+
+
+
 
 easy_button.bind("<Enter>", lambda e: easy_button.config(bg="#cbf0cb")) # effects on hover
 easy_button.bind("<Leave>", lambda e: easy_button.config(bg="#8ef08e"))
@@ -280,7 +416,7 @@ medium_button = tk.Button(screen2,
                         bg="#ebeb78",
                         borderwidth=5,
                         relief="ridge",
-                        command= lambda: start_game(5, word_list_five)) 
+                        command=lambda: fade_out(root, callback=lambda: start_game(5, word_list_five)),)
 
 medium_button.bind("<Enter>", lambda e: medium_button.config(bg="#fafac8")) 
 medium_button.bind("<Leave>", lambda e: medium_button.config(bg="#ebeb78"))
@@ -306,7 +442,7 @@ hard_button = tk.Button(screen2,
                         bg="#fd7979",
                         borderwidth=5,
                         relief="ridge",
-                        command= lambda: start_game(6, word_list_six)) 
+                        command=lambda: fade_out(root, callback=lambda: start_game(6, word_list_six))) 
 
 hard_button.bind("<Enter>", lambda e: hard_button.config(bg="#ffcece")) 
 hard_button.bind("<Leave>", lambda e: hard_button.config(bg="#fd7979"))
