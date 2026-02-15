@@ -3,7 +3,6 @@ import random
 from PIL import Image, ImageTk
 from tkinter import ttk
 from wordfreq import zipf_frequency
-gameLoop = False # true to run game
 import os
 import sys
 
