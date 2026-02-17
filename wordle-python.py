@@ -5,6 +5,8 @@ from tkinter import ttk
 from wordfreq import zipf_frequency
 import os
 import sys
+import re
+
 
 def restart():
     os.execv(sys.executable, ['python'] + sys.argv)
@@ -376,41 +378,34 @@ screen3 = tk.Frame(root, width=600, height=800, bg="#1B1A1A")
 screen4 = tk.Frame(root, width=600, height=800, bg="#1B1A1A")
 
 
-############## GUESS CHECKER ##############
 
+
+
+############################################################ GUESS CHECKER FUNCTION ###########################################################################
 def disappearing_text(label, duration=1000):
     label.after(duration, label.destroy) # destroy label after duration
 
-
-
 def check_guess(entry, target_word):
     global current_row
-    global guess
+    global guesss
     guess = entry.get().lower().strip()
     entry.delete(0, tk.END) # clear entry after sumbit
 
 
 
 
-    # check guess
-    if len(guess) != len(target_word):
-        world_letter_invalid_length = tk.Label(screen3,
-                                text=f"Your guess must have {len(target_word)} digits!",  
-                                font=("Georgia", 15),
-                                fg="red",
-                                bg="#1B1A1A")
-        world_letter_invalid_length.place(relx=0.5, rely=0.775, anchor="center")
-        disappearing_text(world_letter_invalid_length) # call destroying func   
+    if not re.match(fr"^[a-zA-Z]{{{len(target_word)}}}$", guess): # regex - a-zA-Z = no dgits and length = target word length
+        world_letter_invalid = tk.Label(
+        screen3,
+        text=f"Your guess must be {len(target_word)} letters (A–Z only)!",
+        font=("Georgia", 15),
+        fg="red",
+        bg="#1B1A1A"
+        )
+        world_letter_invalid.place(relx=0.5, rely=0.775, anchor="center")
+        disappearing_text(world_letter_invalid)
         return
-    if any(char.isdigit() for char in guess):
-        world_letter_has_digit_invalid = tk.Label(screen3,
-                                text=f"Your guess must have no digits!",  
-                                font=("Georgia", 15),
-                                fg="red",
-                                bg="#1B1A1A")
-        world_letter_has_digit_invalid.place(relx=0.5, rely=0.775, anchor="center")
-        disappearing_text(world_letter_has_digit_invalid) # call destroying func   
-        return
+
     if zipf_frequency(guess, 'en') < 2.5: # check if real word in english
         world_letter_not_real_invalid = tk.Label(screen3,
                                 text=f"Your guess must be a real word!",  
@@ -518,7 +513,7 @@ def start_game(word_length, word_list):
 
     # store tiles
     global tiles, current_row
-    tiles = [] # empty list to store tile labels
+    tiles = [] # empty list to store tile labels (row)
     current_row = 0
 
     # create 6 rows of tiles
