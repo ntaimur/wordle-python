@@ -394,10 +394,10 @@ def check_guess(entry, target_word):
 
 
 
-    if not re.match(fr"^[a-zA-Z]{{{len(target_word)}}}$", guess): # regex - a-zA-Z = no dgits and length = target word length
+    if not re.match(f"^[a-zA-Z]{{{len(target_word)}}}$", guess): # regex - a-zA-Z = no dgits and length = target word length
         world_letter_invalid = tk.Label(
         screen3,
-        text=f"Your guess must be {len(target_word)} letters (A–Z only)!",
+        text=f"Your guess must be {len(target_word)} letters (A-Z only)!",
         font=("Georgia", 15),
         fg="red",
         bg="#1B1A1A"
